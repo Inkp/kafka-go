@@ -913,7 +913,10 @@ func (r *Reader) SetOffset(offset int64) error {
 	if r.useConsumerGroup() {
 		return errNotAvailableWithGroup
 	}
+	return r.SetPartitionOffset(r.config.Partition, offset)
+}
 
+func (r *Reader) SetPartitionOffset(partition int, offset int64) error {
 	var err error
 	r.mutex.Lock()
 
@@ -927,7 +930,7 @@ func (r *Reader) SetOffset(offset int64) error {
 		r.offset = offset
 
 		if r.version != 0 {
-			r.start(map[int]int64{r.config.Partition: r.offset})
+			r.start(map[int]int64{partition: r.offset})
 		}
 
 		r.activateReadLag()
